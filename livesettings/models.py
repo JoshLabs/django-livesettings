@@ -2,6 +2,9 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models, connection, DatabaseError
 
+from libs.models import TrackingModel
+
+
 try:
     from django.apps import apps
 except ImportError:
@@ -131,7 +134,7 @@ class ImmutableSetting(object):
         return "ImmutableSetting: %s.%s=%s" % (self.group, self.key, self.value)
 
 
-class Setting(models.Model, CachedObjectMixin):
+class Setting(CachedObjectMixin, TrackingModel):
     site = models.ForeignKey(Site, verbose_name=_('Site'))
     group = models.CharField(max_length=100, blank=False, null=False)
     key = models.CharField(max_length=100, blank=False, null=False)
@@ -176,7 +179,8 @@ class LongSettingManager(models.Manager):
         siteid = _safe_get_siteid(None)
         return all.filter(site__id__exact=siteid)
 
-class LongSetting(models.Model, CachedObjectMixin):
+
+class LongSetting(CachedObjectMixin, TrackingModel):
     """A Setting which can handle more than 255 characters"""
     site = models.ForeignKey(Site, verbose_name=_('Site'))
     group = models.CharField(max_length=100, blank=False, null=False)
