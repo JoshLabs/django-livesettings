@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = (1, 4, 16)
+VERSION = (1, 4, 17)
 
 # Dynamically calculate the version based on VERSION tuple
 if len(VERSION) > 2 and VERSION[2] is not None:
@@ -29,5 +29,6 @@ setup(
                    'Framework :: Django'],
     packages = find_packages(),
     setup_requires=["setuptools_hg"],
+    install_requires=["django-threaded-multihost==1.4-1"],
     include_package_data = True,
 )
