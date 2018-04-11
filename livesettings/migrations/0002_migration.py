@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='longsetting',
             name='updated_at',
-            field=models.DateTimeField(default=datetime.datetime(2018, 4, 2, 6, 29, 12, 108689), verbose_name='Updated At', auto_now=True),
+            field=models.DateTimeField(default=datetime.datetime.now, verbose_name='Updated At', auto_now=True),
             preserve_default=False,
         ),
         migrations.AddField(
@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='setting',
             name='updated_at',
-            field=models.DateTimeField(default=datetime.datetime(2018, 4, 2, 6, 29, 24, 998104), verbose_name='Updated At', auto_now=True),
+            field=models.DateTimeField(default=datetime.datetime.now, verbose_name='Updated At', auto_now=True),
             preserve_default=False,
         ),
         migrations.AddField(
