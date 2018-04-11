@@ -1,9 +1,11 @@
+from datetime import datetime
+import json
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models, connection, DatabaseError
 
-from libs.models import TrackingModel
-
+from threaded_multihost import threadlocals
 
 try:
     from django.apps import apps
@@ -92,6 +94,43 @@ def find_setting(group, key, site=None):
         raise SettingNotSet(key, cachekey=ck)
 
     return setting
+
+
+class TrackingModel(models.Model):
+    """
+    Abstract model for tracking dates as well as version tracking details
+    """
+    created_at = models.DateTimeField(_('Created at'), default=datetime.now)
+    updated_at = models.DateTimeField(_('Updated At'), auto_now=True)
+    updated_by = models.CharField(
+        max_length=255, help_text='Tracks who updated the record', blank=True, editable=False
+    )
+    updated_through = models.CharField(
+        max_length=255, help_text='Tracks channel through which record was updated', blank=True, editable=False
+    )
+    updating_process = models.CharField(
+        max_length=255, help_text='Tracks the process/method updating the record', blank=True, editable=False
+    )
+    updating_process_meta = models.TextField(
+        help_text='Contains meta information regarding process updating record like File Name etc.',
+        blank=True, editable=False
+    )
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        data = threadlocals.get_thread_variable('versioning_data', {})
+        if hasattr(self, 'updated_by'):
+            self.updated_by = data.get('updated_by', 'SYSTEM')
+        if hasattr(self, 'updated_through'):
+            self.updated_through = data.get('updated_through', 'SHELL')
+        if hasattr(self, 'updating_process'):
+            self.updating_process = data.get('updating_process', '')
+        if hasattr(self, 'updating_process_meta'):
+            self.updating_process_meta = json.dumps(data.get('updating_process_meta', {}))
+        super(TrackingModel, self).save(*args, **kwargs)
+
 
 class SettingNotSet(Exception):
     def __init__(self, k, cachekey=None):
