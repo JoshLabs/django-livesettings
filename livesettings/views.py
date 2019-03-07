@@ -11,7 +11,7 @@ from livesettings.overrides import get_overrides
 import logging
 
 log = logging.getLogger('livesettings.views')
-login_url = getattr(settings, 'ADMIN_LOGIN_URL', None)
+login_url = getattr(settings, 'LS_LOGIN_URL', None)
 
 @csrf_protect
 def group_settings(request, group, template='livesettings/group_settings.html'):
