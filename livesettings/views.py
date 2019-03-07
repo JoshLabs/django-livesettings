@@ -11,6 +11,7 @@ from livesettings.overrides import get_overrides
 import logging
 
 log = logging.getLogger('livesettings.views')
+login_url = getattr(settings, 'ADMIN_LOGIN_URL', None)
 
 @csrf_protect
 def group_settings(request, group, template='livesettings/group_settings.html'):
@@ -60,7 +61,7 @@ def group_settings(request, group, template='livesettings/group_settings.html'):
         'use_db' : use_db,
     }
     return render(request, template, context=context)
-group_settings = never_cache(permission_required('livesettings.change_setting', settings.ADMIN_LOGIN_URL)(group_settings))
+group_settings = never_cache(permission_required('livesettings.change_setting', login_url)(group_settings))
 
 # Site-wide setting editor is identical, but without a group
 # permission_required is implied, since it calls group_settings
@@ -89,4 +90,4 @@ def export_as_python(request):
 
 # Required permission `is_superuser` is equivalent to auth.change_user,
 # because who can modify users, can easy became a superuser.
-export_as_python = never_cache(permission_required('auth.change_user', settings.ADMIN_LOGIN_URL)(export_as_python))
+export_as_python = never_cache(permission_required('auth.change_user', login_url)(export_as_python))
