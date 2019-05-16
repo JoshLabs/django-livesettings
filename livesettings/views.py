@@ -1,12 +1,14 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
+from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.cache import never_cache
 from livesettings import forms
 from livesettings.functions import ConfigurationSettings
+from livesettings.models import Setting, LongSetting
 from livesettings.overrides import get_overrides
 import logging
 
@@ -28,6 +30,8 @@ def group_settings(request, group, template='livesettings/group_settings.html'):
         title = settings.name
         log.debug('title: %s', title)
 
+    current_version = max(Setting.objects.latest('version').version, LongSetting.objects.latest('version').version)
+
     if use_db:
         # Create an editor customized for the current user
         # editor = forms.customized_editor(settings)
@@ -35,18 +39,28 @@ def group_settings(request, group, template='livesettings/group_settings.html'):
         if request.method == 'POST':
             # Populate the form with user-submitted data
             data = request.POST.copy()
+            version = int(data.pop('version')[0])
             form = forms.SettingsEditor(data, settings=settings)
-            if form.is_valid():
-                form.full_clean()
-                for name, value in form.cleaned_data.items():
-                    group, key = name.split('__')
-                    cfg = mgr.get_config(group, key)
-                    if cfg.update(value):
+            if version == current_version:
+                if form.is_valid():
+                    form.full_clean()
+                    with transaction.atomic():
+                        for name, value in form.cleaned_data.items():
+                            group, key = name.split('__')
+                            cfg = mgr.get_config(group, key)
+                            if cfg.update(value):
 
-                        # Give user feedback as to which settings were changed
-                        messages.add_message(request, messages.INFO, 'Updated %s on %s' % (cfg.key, cfg.group.key))
+                                # Give user feedback as to which settings were changed
+                                messages.add_message(request, messages.INFO, 'Updated %s on %s' % (cfg.key, cfg.group.key))
+                        Setting.objects.update(version=current_version + 1)
+                        LongSetting.objects.update(version=current_version + 1)
 
-                return HttpResponseRedirect(request.path)
+                    return HttpResponseRedirect(request.path)
+            else:
+                messages.add_message(
+                    request, messages.ERROR,
+                    'You are on incorrect version of settings. Please refresh the page before updating settings.'
+                )
         else:
             # Leave the form populated with current setting values
             # form = editor()
@@ -59,6 +73,7 @@ def group_settings(request, group, template='livesettings/group_settings.html'):
         'group' : group,
         'form': form,
         'use_db' : use_db,
+        'version': current_version,
     }
     return render(request, template, context=context)
 group_settings = never_cache(permission_required('livesettings.change_setting', login_url)(group_settings))

@@ -35,6 +35,7 @@
 <form method="post"> {% csrf_token %}
 	<div class="module">
     <table summary="{% filter capfirst %}{% blocktrans with group.name as name %}Settings included in {{ name }}.{% endblocktrans %}{% endfilter %}" width="100%">
+		<tr style="display: none;"><td><input type="hidden" name="version" id="version" value="{{ current_version }}"/></td></tr>
 		{% for field in form %}
 			{% if field.errors %}
 			<tr class="error">

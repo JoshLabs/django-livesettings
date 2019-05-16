@@ -351,7 +351,12 @@ class Value(object):
 
     def make_setting(self, db_value):
         log.debug('new setting %s.%s', self.group.key, self.key)
-        return Setting(group=self.group.key, key=self.key, value=db_value)
+        setting_obj = Setting.objects.latest('version')
+        if setting_obj:
+            version = setting_obj.version
+        else:
+            version = 1
+        return Setting(group=self.group.key, key=self.key, value=db_value, version=version)
 
     def _setting(self):
         return find_setting(self.group.key, self.key)
@@ -732,7 +737,12 @@ class LongStringValue(Value):
 
     def make_setting(self, db_value):
         log.debug('new long setting %s.%s', self.group.key, self.key)
-        return LongSetting(group=self.group.key, key=self.key, value=db_value)
+        setting_obj = Setting.objects.latest('version')
+        if setting_obj:
+            version = setting_obj.version
+        else:
+            version = 1
+        return LongSetting(group=self.group.key, key=self.key, value=db_value, version=version)
 
     def to_python(self, value):
         if value == NOTSET:
@@ -779,7 +789,12 @@ class MultipleStringValue(Value):
 class LongMultipleStringValue(MultipleStringValue):
     def make_setting(self, db_value):
         log.debug('new long setting %s.%s', self.group.key, self.key)
-        return LongSetting(group=self.group.key, key=self.key, value=db_value)
+        setting_obj = Setting.objects.latest('version')
+        if setting_obj:
+            version = setting_obj.version
+        else:
+            version = 1
+        return LongSetting(group=self.group.key, key=self.key, value=db_value, version=version)
 
 class ModuleValue(Value):
     """Handles setting modules, storing them as strings in the db."""

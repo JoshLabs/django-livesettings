@@ -143,7 +143,7 @@ class SettingManager(models.Manager):
         return self.get_queryset()
 
     def get_queryset(self):
-    	if hasattr(super(SettingManager, self), 'get_queryset'):
+        if hasattr(super(SettingManager, self), 'get_queryset'):
             all = super(SettingManager, self).get_queryset()
         else:
             all = super(SettingManager, self).get_query_set()
@@ -178,6 +178,7 @@ class Setting(CachedObjectMixin, TrackingModel):
     group = models.CharField(max_length=100, blank=False, null=False)
     key = models.CharField(max_length=100, blank=False, null=False)
     value = models.CharField(max_length=255, blank=True)
+    version = models.PositiveIntegerField(default=1)
 
     objects = SettingManager()
 
@@ -210,7 +211,7 @@ class LongSettingManager(models.Manager):
         return self.get_queryset()
 
     def get_queryset(self):
-    	if hasattr(super(LongSettingManager, self), 'get_queryset'):
+        if hasattr(super(LongSettingManager, self), 'get_queryset'):
             all = super(LongSettingManager, self).get_queryset()
         else:
             all = super(LongSettingManager, self).get_query_set()
@@ -225,6 +226,7 @@ class LongSetting(CachedObjectMixin, TrackingModel):
     group = models.CharField(max_length=100, blank=False, null=False)
     key = models.CharField(max_length=100, blank=False, null=False)
     value = models.TextField(blank=True)
+    version = models.PositiveIntegerField(default=1)
 
     objects = LongSettingManager()
 
