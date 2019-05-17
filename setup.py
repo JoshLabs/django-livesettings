@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = (1, 4, 17)
+VERSION = (1, 4, 18)
 
 # Dynamically calculate the version based on VERSION tuple
 if len(VERSION) > 2 and VERSION[2] is not None:

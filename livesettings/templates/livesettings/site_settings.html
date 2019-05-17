@@ -72,6 +72,7 @@ uncollapse = function() {
 	{% endif %}
 	{% if form.fields %}
 	<form method="post" id="settingsform">{% csrf_token %}
+        <input type="hidden" name="version" value="{{ version }}"/>
           {% for field in form %}
             {% if field.is_hidden %}
               <tr style="display: none;"><td>{{ field }}</td></tr>
