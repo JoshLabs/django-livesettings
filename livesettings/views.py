@@ -30,7 +30,16 @@ def group_settings(request, group, template='livesettings/group_settings.html'):
         title = settings.name
         log.debug('title: %s', title)
 
-    current_version = max(Setting.objects.latest('version').version, LongSetting.objects.latest('version').version)
+    try:
+        setting_version = Setting.objects.latest('version').version
+    except Setting.DoesNotExist:
+        setting_version = 1
+    try:
+        long_setting_version = LongSetting.objects.latest('version')
+    except LongSetting.DoesNotExist:
+        long_setting_version = 1
+
+    current_version = max(setting_version, long_setting_version)
 
     if use_db:
         # Create an editor customized for the current user

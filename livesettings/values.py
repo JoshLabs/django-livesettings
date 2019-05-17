@@ -351,10 +351,9 @@ class Value(object):
 
     def make_setting(self, db_value):
         log.debug('new setting %s.%s', self.group.key, self.key)
-        setting_obj = Setting.objects.latest('version')
-        if setting_obj:
-            version = setting_obj.version
-        else:
+        try:
+            version = Setting.objects.latest('version').version
+        except Setting.DoesNotExist:
             version = 1
         return Setting(group=self.group.key, key=self.key, value=db_value, version=version)
 
@@ -737,10 +736,9 @@ class LongStringValue(Value):
 
     def make_setting(self, db_value):
         log.debug('new long setting %s.%s', self.group.key, self.key)
-        setting_obj = Setting.objects.latest('version')
-        if setting_obj:
-            version = setting_obj.version
-        else:
+        try:
+            version = LongSetting.objects.latest('version').version
+        except LongSetting.DoesNotExist:
             version = 1
         return LongSetting(group=self.group.key, key=self.key, value=db_value, version=version)
 
@@ -789,10 +787,9 @@ class MultipleStringValue(Value):
 class LongMultipleStringValue(MultipleStringValue):
     def make_setting(self, db_value):
         log.debug('new long setting %s.%s', self.group.key, self.key)
-        setting_obj = Setting.objects.latest('version')
-        if setting_obj:
-            version = setting_obj.version
-        else:
+        try:
+            version = LongSetting.objects.latest('version').version
+        except LongSetting.DoesNotExist:
             version = 1
         return LongSetting(group=self.group.key, key=self.key, value=db_value, version=version)
 
