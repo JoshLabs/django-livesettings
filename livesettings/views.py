@@ -35,7 +35,7 @@ def group_settings(request, group, template='livesettings/group_settings.html'):
     except Setting.DoesNotExist:
         setting_version = 1
     try:
-        long_setting_version = LongSetting.objects.latest('version')
+        long_setting_version = LongSetting.objects.latest('version').version
     except LongSetting.DoesNotExist:
         long_setting_version = 1
 
