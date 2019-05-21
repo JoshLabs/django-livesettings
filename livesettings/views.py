@@ -70,6 +70,7 @@ def group_settings(request, group, template='livesettings/group_settings.html'):
                     request, messages.ERROR,
                     'You are on incorrect version of settings. Please refresh the page before updating settings.'
                 )
+                current_version = version
         else:
             # Leave the form populated with current setting values
             # form = editor()
